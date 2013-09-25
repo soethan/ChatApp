@@ -1,0 +1,64 @@
+﻿<html>
+<head>
+<title>Node.js WebSocket chat</title>
+<style type="text/css">
+#input {width: 200px;}
+#messages { position: fixed; top: 40px; bottom: 8px; left: 8px; right: 8px; border: 1px solid #EEEEEE; padding: 8px; }
+</style>
+</head>
+<body>
+<input type="button" value="Connect" onclick="Connect2Server()" />
+<input type="button" value="Disconnect" onclick="Disconnect()" />
+User Name: <input type="text" id="userName">
+Your message: <input type="text" id="input">
+<div id="messages"></div>
+
+<script src="http://localhost:4000/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+	var messagesElement = document.getElementById('messages');
+	var userNameElement = document.getElementById('userName');
+	var lastMessageElement = null;
+	
+	function addMessage(message) {
+		var newMessageElement = document.createElement('div');
+		var newMessageText = document.createTextNode(message);
+		newMessageElement.appendChild(newMessageText);
+		messagesElement.insertBefore(newMessageElement,
+		lastMessageElement);
+		lastMessageElement = newMessageElement;
+	}
+	var socket;
+	
+	function Connect2Server(){
+		if(userNameElement.value == ''){
+			alert('Please enter User Name!');
+			return false;
+		}
+			
+		socket = io.connect('http://localhost:4000/chat');//Using namespace '/chat'
+		socket.on('serverMessage', function(content) {
+			addMessage(content);
+		});
+		
+		socket.emit('loginMessage', userNameElement.value);
+	}
+	
+	function Disconnect(){
+		socket.disconnect();
+		addMessage("Disconnected from Server");
+	}
+	
+	var inputElement = document.getElementById('input');
+	inputElement.onkeydown = function(keyboardEvent) {
+		if (keyboardEvent.keyCode === 13) {
+			socket.emit('clientMessage', {title: "Title of " + inputElement.value, body: inputElement.value});
+			inputElement.value = '';
+			return false;
+		} 
+		else {
+			return true;
+		}
+	};
+</script>
+</body>
+</html>
