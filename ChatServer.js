@@ -3,7 +3,7 @@ var io = require('socket.io').listen(httpd);
 var chat = io.of('/chat');//Using namespace
 var fs = require('fs');
 httpd.listen(4000);
-
+//test
 function handler(req, response) {
 	fs.readFile(__dirname + '/index.html',
 		function(err, data) {
